@@ -1,0 +1,18 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "khj-u3-f24.title" : {
+      "comment" : "Class = \"UITabBarItem\"; title = \"Item\"; ObjectID = \"khj-u3-f24\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Item"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
