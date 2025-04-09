@@ -61,10 +61,14 @@ class MealListViewController: UIViewController , UITableViewDataSource, UITableV
     //Kaydırarak favorilere ekleme fonksiyonu
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let favoriteAction = UIContextualAction(style: .normal, title: "Favorite") { [weak self] (action, view, completionHandler) in
-            guard let self = self else { return }
+        
             let meal = self.viewModel.meals[indexPath.row]
-            CoreDataManager.shared.addToFavorites(meal: meal)
+            let isFavorited = CoreDataManager.shared.isMEalFavorited(meal: meal)
+            let actionTitle = isFavorited ? "Favorited" : "Favorite"
+            
+            let favoriteAction = UIContextualAction(style: .normal, title: actionTitle) { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            
             
             //Bildirim göstermek için
             let alert = UIAlertController(title: "Added", message: "Meal added successfully to favorites", preferredStyle: .alert)
@@ -76,12 +80,12 @@ class MealListViewController: UIViewController , UITableViewDataSource, UITableV
         }
         
         
-        favoriteAction.backgroundColor = .systemRed
-        favoriteAction.image = UIImage(systemName: "heart.fill")
+        // Eğer yemek favorilerdeyse swipe aksiyonu gri, değilse kırmızı olacak.
+        favoriteAction.backgroundColor = isFavorited ? .systemGray : .systemRed
+        favoriteAction.image = UIImage(systemName: isFavorited ? "heart.fill" : "heart")
         
         
         //istediğim aksiyonu Swipe ile yapılandırmayı ekleme
-        
         let configuration = UISwipeActionsConfiguration(actions: [favoriteAction])
         configuration.performsFirstActionWithFullSwipe = true  //tam sola kaydırıldığında aksiyon tetiklenmeli
         return configuration

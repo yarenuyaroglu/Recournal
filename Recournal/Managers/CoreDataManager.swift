@@ -72,4 +72,17 @@ class CoreDataManager {
             print("Meal favorilere eklenemedi.")
         }
     }
+    
+    
+    func isMEalFavorited(meal: Meal) -> Bool {
+        let request = NSFetchRequest<NSManagedObject>(entityName: "Meals")
+        request.predicate = NSPredicate(format: "id == %@", meal.id)
+        do{
+            let results = try context.fetch(request)
+            return !results.isEmpty
+        } catch {
+            print("Favori kontrolü yapılırken hata oluştu")
+            return false
+        }
+    }
 }

@@ -78,7 +78,12 @@ class MealDetailViewController: UIViewController {
         
         
         //Favorilere eklemek için kalp butonu
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(addToFavorites))
+        //eğer favorilerdeyse heart.fill
+        if let meal = meal, CoreDataManager.shared.isMEalFavorited(meal: meal){
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart.fill"), style: .plain, target: self, action: #selector(addToFavorites))
+        } else {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(addToFavorites))
+        }
     }
     
     

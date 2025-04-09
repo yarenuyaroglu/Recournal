@@ -67,16 +67,28 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
     func fetchFavorites() {
         //Meals entity'sini çekmek için
         let request = NSFetchRequest<NSManagedObject>(entityName: "Meals")
+        
         do{
-            favorites = try CoreDataManager.shared.context.fetch(request)
-        }
-        catch{
-            print("Favoriler çekilmedi: \(error)")
+            //Tüm favori kayıtları çekiliyor
+            let fetchedFavorites = try CoreDataManager.shared.context.fetch(request)
+            
+            //Aynı id'ye sahi kayıtları filtrelemek için --> Set
+            var seenIDs = Set<String>()
+            favorites = fetchedFavorites.filter { favorite in
+                if let id = favorite.value(forKey: "id") as? String{
+                    if seenIDs.contains(id) {
+                        //Bu id daha önce eklenmişse filtrele
+                        return false
+                    }
+                    else {
+                        seenIDs.insert(id)
+                        return true
+                    }
+                }
+                return false
+            }
+        } catch {
+            print("Favoriler çekilemedi. \(error)")
         }
     }
-    
-    
-    
-
-
 }
