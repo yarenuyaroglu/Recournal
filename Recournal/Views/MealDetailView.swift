@@ -1,33 +1,30 @@
 //
-//  MealDetailViewController.swift
+//  MealDetailView.swift
 //  Recournal
 //
-//  Created by YarenEteration on 8.04.2025.
+//  Created by YarenEteration on 16.04.2025.
 //
 
 import UIKit
 
-class MealDetailViewController: UIViewController {
-    
-    var meal: Meal?
+class MealDetailView: UIView {
+
     
     // scrollView ve container ile dikeyde kaydırılabilir halde
-    private let scrollView: UIScrollView = {
+    let scrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.showsVerticalScrollIndicator = true
         return sv
     }()
-    
+ 
     private let contentView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+        let cv = UIView()
+        cv.translatesAutoresizingMaskIntoConstraints = false
+        return cv
     }()
     
-    //stackView içine resim, başlık, malzemeler
-    //AutoLAyout yerine dikey sıralamayı yönetmek için
-    private let stackView: UIStackView = {
+    let stackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
         sv.spacing = 8
@@ -37,14 +34,14 @@ class MealDetailViewController: UIViewController {
     }()
     
     // UI elemanları
-    private let mealImageView: UIImageView = {
+     let mealImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
     }()
     
-    private let titleLabel: UILabel = {
+     let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 25)
         label.numberOfLines = 0
@@ -52,7 +49,7 @@ class MealDetailViewController: UIViewController {
         return label
     }()
     
-    private let ingredientsLabel: UILabel = {
+     let ingredientsLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 18)
         label.numberOfLines = 0
@@ -60,7 +57,7 @@ class MealDetailViewController: UIViewController {
         return label
     }()
     
-    private let instructionsTextView: UITextView = {
+     let instructionsTextView: UITextView = {
         let textView = UITextView()
         textView.font = UIFont.systemFont(ofSize: 16)
         textView.isEditable = false
@@ -68,37 +65,36 @@ class MealDetailViewController: UIViewController {
         return textView
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        
+    //Başlatıcılar ve layout ayarları
+    override init(frame: CGRect){
+        super.init(frame: frame)
+        setupView()
         setupScrollView()
         setupStackView()
-        configureUI()
-        
-        
-        //Favorilere eklemek için kalp butonu
-        //eğer favorilerdeyse heart.fill
-        if let meal = meal, CoreDataManager.shared.isMEalFavorited(meal: meal){
-            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart.fill"), style: .plain, target: self, action: #selector(addToFavorites))
-        } else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(addToFavorites))
-        }
     }
-    
-    
+    required init?(coder: NSCoder){
+        super.init(coder: coder)
+        setupView()
+        setupScrollView()
+        setupStackView()
+    }
+        
+    private func setupView() {
+        backgroundColor = .white
+        }
+
     private func setupScrollView() {
         // ScrollView --> Ana view
         // contentView --> ScrollView
-        view.addSubview(scrollView)
+        addSubview(scrollView)
         scrollView.addSubview(contentView)
         
         // ScrollView constraint’leri
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
             // contentView’i scrollView’e 4 kenardan sabitle
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
@@ -110,7 +106,7 @@ class MealDetailViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
     }
-    
+
     private func setupStackView() {
         // contentView içine stackView ekle
         contentView.addSubview(stackView)
@@ -133,46 +129,4 @@ class MealDetailViewController: UIViewController {
         mealImageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
     }
     
-   private func configureUI() {
-        guard let meal = meal else {
-            print("Hata: Meal değeri nil!")
-            return
-        }
-        titleLabel.text = meal.title
-        instructionsTextView.text = meal.instructions
-        let ingredientsText = meal.ingredients.joined(separator: "\n")
-        ingredientsLabel.text = "Ingredients:\n\(ingredientsText)"
-        
-        if let imageUrl = URL(string: meal.image) {
-            URLSession.shared.dataTask(with: imageUrl) { data, _, error in
-                if let error = error {
-                    print("Resim yükleme hatası: \(error.localizedDescription)")
-                    return
-                }
-                if let data = data, let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self.mealImageView.image = image
-                    }
-                } else {
-                    print("Resim verisi bulunamadı veya UIImage'e çevrilemedi.")
-                }
-            }.resume()
-        } else {
-            print("Geçersiz resim URL'si: \(meal.image)")
-        }
     }
-
-    
-    @objc func addToFavorites(){
-        guard let meal = meal else {
-            print("Meal verisi boş")
-            return
-        }
-        
-        CoreDataManager.shared.addToFavorites(meal: meal)
-        let alert = UIAlertController(title: "Added!", message: "Meal was added successfully to Favorites", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title:"OK", style: .default))
-        present(alert, animated: true)
-    }
-}
-

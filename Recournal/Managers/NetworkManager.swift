@@ -8,18 +8,12 @@
 import Foundation
 import Combine
 
-
-
-
 //Network Manager
 class NetworkManager{
     
     //singleton örneği
     static let shared = NetworkManager()
-    
-    let urlString = "https://www.themealdb.com/api/json/v1/1/search.php?s="
 
-    
     private init() { }
     
     
@@ -30,6 +24,7 @@ class NetworkManager{
         let urlString = "https://www.themealdb.com/api/json/v1/1/search.php?s="
         guard let url = URL(string: urlString) else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+            //Url stringi dışarıdan alırsan kullan.
         }
         
         //URLSession ile veri çekip, decode ediyoruz.

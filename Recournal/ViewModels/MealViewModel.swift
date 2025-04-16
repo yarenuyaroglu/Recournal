@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-//MealViewModel, ObserverObject protokülünü uygular.
+
 //Bu, Combine ile UI güncellemelerini yönetmeyi sağlar
 
 class MealViewModel : ObservableObject{
@@ -20,7 +20,7 @@ class MealViewModel : ObservableObject{
     //@Published ile bu değişkenlerde bir değişiklik olduğunda onları subscribe eden nesnelere otomatik bildirim gönderilir.
     @Published var meals : [Meal] = []
     @Published var errorMessage : String = ""
-    
+     
     
     //Combine aboneliklerini saklamak için bir set
     private var cancellables = Set<AnyCancellable>()
@@ -32,10 +32,11 @@ class MealViewModel : ObservableObject{
         //NetworkManager'ın fetchMeals fonksiyonunu çağırır.
         NetworkManager.shared.fetchMeals()
             .sink { [weak self] completion in
+                guard let self = self else { return } // self? kullanmamak için
                 // Hata kontrolü : Eğer hata oluşursa errorMessage
                 switch completion{
                 case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                    errorMessage = error.localizedDescription
                 case .finished:
                     break
                 }

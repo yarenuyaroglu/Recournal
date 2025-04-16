@@ -13,7 +13,33 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
     //COre Data'dan çekilen favori öğeleri tutuacak olan dizi
     
     var favorites: [NSManagedObject] = []
-    let tableView = UITableView()
+    
+    
+    private var favoritesView : FavoritesView!{
+        return self.view as? FavoritesView
+    }
+    
+    
+    override func loadView() {
+        view = FavoritesView()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        title = "Favorites"
+        
+        setupTableView()
+        fetchFavorites()
+    }
+    
+    
+    //ekran her göründüğünde en güncel favori verilerini çekmek için
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchFavorites()
+        favoritesView.tableView.reloadData()
+    }
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -33,36 +59,15 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
         let meal = Meal(managedObject: favorite)
         let detailVC = MealDetailViewController()
         detailVC.meal = meal
-        detailVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(detailVC, animated: true)
     }
+
     
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        title = "❤️Favorites❤️"
-        
-        
-        //tableView ayarları
-        tableView.frame = view.bounds
-        tableView.dataSource = self
+    private func setupTableView(){
+        guard let tableView = favoritesView?.tableView else {return}
         tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        view.addSubview(tableView)
-        
-        fetchFavorites()
+        tableView.dataSource = self
     }
-    
-    
-    
-    //ekran her göründüğünde en güncel favori verilerini çekmek için
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        fetchFavorites()
-        tableView.reloadData()
-    }
-    
     
     func fetchFavorites() {
         //Meals entity'sini çekmek için

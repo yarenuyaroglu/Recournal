@@ -8,26 +8,30 @@ import UIKit
 
 class MyRecipesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, AddRecipeDelegate {
     
-    var tableView: UITableView!
     // Kullanıcı tarafından eklenen tariflerin tutulacağı liste
     var recipes: [UserRecipeModel] = []
+    
+    private var myRecipesView: MyRecipesView! {
+        return self.view as? MyRecipesView
+    }
+    
+    override func loadView() {
+        view = MyRecipesView()
+    }
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         title = "My Recipes"
-        
-        // TableView kurulumu
-        tableView = UITableView(frame: view.bounds)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "RecipeCell")
-        view.addSubview(tableView)
-        
+
         // Navigation bar’daki "+" butonu
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                             target: self,
                                                             action: #selector(addRecipeTapped))
+        
+        setupTableView()
     }
     
     @objc func addRecipeTapped() {
@@ -37,7 +41,14 @@ class MyRecipesViewController: UIViewController, UITableViewDataSource, UITableV
         navigationController?.pushViewController(addVC, animated: true)
     }
     
-    // MARK: - UITableView DataSource & Delegate
+    
+    private func setupTableView() {
+        guard let tableView = myRecipesView?.tableView else {return}
+        tableView.delegate = self
+        tableView.dataSource = self
+    }
+
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recipes.count
     }
@@ -54,11 +65,13 @@ class MyRecipesViewController: UIViewController, UITableViewDataSource, UITableV
         let detailVC = RecipeDetailViewController()
         detailVC.recipe = recipe
         navigationController?.pushViewController(detailVC, animated: true)
+        
+
     }
     
-    // MARK: - AddRecipeDelegate
+
     func didAddRecipe(_ recipe: UserRecipeModel) {
         recipes.append(recipe)
-        tableView.reloadData()
+        myRecipesView?.tableView.reloadData()
     }
 }

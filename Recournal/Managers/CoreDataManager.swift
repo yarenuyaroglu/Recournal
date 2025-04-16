@@ -24,7 +24,7 @@ class CoreDataManager {
         }
     }
     
-    
+    //tüm core data işlemlerini yöneten çalışma alanı
     var context : NSManagedObjectContext{
         return persistentContainer.viewContext
     }
@@ -57,7 +57,6 @@ class CoreDataManager {
         favoriteMeal.setValue(meal.id, forKey: "id")
         favoriteMeal.setValue(meal.title, forKey: "title")
         favoriteMeal.setValue(meal.image, forKey: "image")
-        favoriteMeal.setValue(meal.summary, forKey: "summary")
         favoriteMeal.setValue(meal.instructions, forKey: "instructions")
         
         //ingredients dizini virgülle ayrılmış bir stringe çevir

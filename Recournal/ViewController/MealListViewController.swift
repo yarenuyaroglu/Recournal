@@ -14,7 +14,31 @@ class MealListViewController: UIViewController , UITableViewDataSource, UITableV
     private let viewModel = MealViewModel()
     private var cancellables = Set<AnyCancellable>()
     
-    private let tableView = UITableView()
+    private var  mealListView: MealListView! {
+        return self.view as? MealListView
+    }
+    
+    override func loadView() {
+        view = MealListView()
+    }
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupTableView()               //UI elemanlarını kur
+        bindViewModel()         //ViewModel ile abonelikleri oluştur
+        viewModel.fetchMeals()  //API'den tarifleri çekmeye başla
+    }
+    
+    
+    
+    
+    private func setupTableView() {
+        guard let tableView = mealListView?.tableView else {return}
+        tableView.delegate = self
+        tableView.dataSource = self
+    }
     
     
     //tableView'da kaç satır olsun
@@ -29,18 +53,8 @@ class MealListViewController: UIViewController , UITableViewDataSource, UITableV
         let meal = viewModel.meals[indexPath.row]
         //hücrede tarifin başlığını göster
         cell.textLabel?.text = meal.title
-        
         return cell
     }
-    
-    //tableView'e kaydırılabilme özelliği
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    
-    
-    
     
     
     //Segue
@@ -91,35 +105,17 @@ class MealListViewController: UIViewController , UITableViewDataSource, UITableV
         return configuration
     }
         
+
         
+
         
-        
-        
-        
-        
-        override func viewDidLoad() {
-            super.viewDidLoad()
-            setupUI()               //UI elemanlarını kur
-            bindViewModel()         //ViewModel ile abonelikleri oluştur
-            viewModel.fetchMeals()  //API'den tarifleri çekmeye başla
-        }
-        
-        
-        
-        private func setupUI(){
-            view.addSubview(tableView)
-            tableView.frame = view.bounds //tableView, tüm ekranı kaplasın
-            tableView.delegate = self
-            tableView.dataSource = self
-            tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MealCell")
-        }
         
         private func bindViewModel(){
             //MealViewModel'deki meals değişkenini dinle ve TableView'ı güncelle.
             viewModel.$meals
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] _ in
-                    self?.tableView.reloadData()}
+                    self?.mealListView.tableView.reloadData()}
                 .store(in: &cancellables)
             
             //Hata mesajlarını dinle ve gerektiğinde alert ile göster

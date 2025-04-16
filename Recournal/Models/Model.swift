@@ -11,27 +11,17 @@ import Foundation
 import Combine
 import CoreData
 
-//Dinamik CodingKey yapısı --> Sabit olmayan keyleri işlemek için.
-//ingredient_1, ingredient_2 gibi
-struct DynamicCodingKeys : CodingKey {
-    var stringValue: String
-    init?(stringValue: String) {
-        self.stringValue = stringValue
-    }
-    
-    
-    var intValue: Int? = nil
-    init?(intValue: Int) {
-        return nil
-    }
-}
+//buna çevir
+//struct Ingredient {
+//    let id : String
+//    let ingredient :
+//}
 
 //Tarif Modeli
 struct Meal: Codable, Identifiable {
     let id: String                  //idMeal
     let title: String               //strMeal
     let image: String               //strMealThumb
-    let summary: String             //Kısa açıklama
     let instructions: String        //strInstructions
     let ingredients: [String]       //Malzemeler ve ölçü listesi
     
@@ -43,6 +33,20 @@ struct Meal: Codable, Identifiable {
         case title = "strMeal"
         case image = "strMealThumb"
         case instructions = "strInstructions"
+    }
+    
+    //Dinamik CodingKey yapısı --> Sabit olmayan keyleri işlemek için.
+    //ingredient_1, ingredient_2 gibi
+    struct DynamicCodingKeys : CodingKey {
+        var stringValue: String
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+        
+        var intValue: Int? = nil
+        init?(intValue: Int) {
+            return nil
+        }
     }
     
     
@@ -57,9 +61,6 @@ struct Meal: Codable, Identifiable {
         self.image = try container.decode(String.self, forKey: .image)
         self.instructions = try container.decode(String.self, forKey: .instructions)
         
-        
-        //mesela ilk 100 karakteri özet olarak belirle
-        self.summary = String(self.instructions.prefix(100))
         
         //Dinamik olaak 20 adet ingredient ve measure alanını kontrol etsin.
         let dynamicContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
@@ -92,18 +93,20 @@ struct Meal: Codable, Identifiable {
         
         self.ingredients = tempIngredients
     }
+    
+    //!
     init(managedObject: NSManagedObject) {
         self.id = managedObject.value(forKey: "id") as? String ?? ""
         self.title = managedObject.value(forKey: "title") as? String ?? ""
         self.image = managedObject.value(forKey: "image") as? String ?? ""
         self.instructions = managedObject.value(forKey: "instructions") as? String ?? ""
-        self.summary = managedObject.value(forKey: "summary") as? String ?? ""
         let ingredientsString = managedObject.value(forKey: "ingredients") as? String ?? ""
         self.ingredients = ingredientsString.isEmpty ? [] : ingredientsString.components(separatedBy: ", ")
     }
 }
     
-//Api yanıtını kapsayan model
+//Api yanıtını kapsayan mode
 struct MealResponse : Codable{
     let meals : [Meal]
 }
+

@@ -9,7 +9,7 @@ import UIKit
 
 // Kullanıcı eklediği tarifi temsil eden model (benzersiz id oluşturuluyor)
 struct UserRecipeModel {
-    let id: String
+    let id: String//UUID yap
     let title: String
     let ingredients: String
     let instructions: String
@@ -17,6 +17,6 @@ struct UserRecipeModel {
 }
 
 // AddRecipeViewController’dan veri geri aktarmak için delegate protokolü
-protocol AddRecipeDelegate: AnyObject {
+protocol AddRecipeDelegate: AnyObject { //Sadece class türleri tarafından benimsenebilir(bellek yönetimini kolaylaştırmak için)
     func didAddRecipe(_ recipe: UserRecipeModel)
 }
